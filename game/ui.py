@@ -10,18 +10,16 @@ def move_poly(polygon, x, y):
     return polygon
 
 def draw_entity(screen, colour, entity):
-    entity_body = pygame.Rect(0, 0, entity.width, entity.height)
-    entity_body.center = (entity.x_pos, entity.y_pos)
-
-    pygame.draw.rect(screen, colour, entity_body)
+    pygame.draw.polygon(screen, colour, entity.pointlist)
 
 def draw_ship(screen, ship):
-    pygame.draw.rect(screen, GREEN, ship.rect)
-    pygame.draw.rect(screen, RED, ship.gun.rect)
+    draw_entity(screen, GREEN, ship)
+    draw_entity(screen, RED, ship.gun)
+    # pygame.draw.rect(screen, RED, ship.gun.rect)
 
 def draw_bullets(screen, bullets):
     for bullet in bullets:
-        pygame.draw.rect(screen, RED, bullet.rect)
+        draw_entity(screen, RED, bullet)
 
 running = True
 
@@ -48,7 +46,7 @@ while running:
 
     for bullet in bullets:
         bullet.move()
-        if bullet.rect.centery < 0 or bullet.rect.centery > SCREEN_HEIGHT:
+        if bullet.y < 0 or bullet.y > SCREEN_HEIGHT:
             bullets.remove(bullet)
 
     for event in pygame.event.get():
@@ -64,12 +62,12 @@ while running:
             if event.dict["key"] == pygame.K_DOWN:
                 SHIP.move(0, MOVEMENT_CONSTANT)
             if event.dict["key"] == pygame.K_SPACE:
-                new_bullet = Bullet(SHIP.rect.centerx, SHIP.rect.centery, SHIP.rotation)
+                new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                 bullets.append(new_bullet)
             if event.dict["key"] == pygame.K_a:
-                SHIP.rotate(5)
+                SHIP.gun.rotate(-5)
             if event.dict["key"] == pygame.K_d:
-                SHIP.rotate(-5)
+                SHIP.gun.rotate(5)
 
     draw_ship(screen, SHIP)
     draw_bullets(screen, bullets)

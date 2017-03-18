@@ -20,10 +20,18 @@ class Entity():
 
         self.COORDINATE_X = 0
         self.COORDINATE_Y = 1
-       
         self.identifier = identifier
-        self.rect = pygame.Rect(0, 0, w, h)
-        self.rect.center = (x, y)
+
+        rect = pygame.Rect(0, 0, w, h)
+        rect.center = (x, y)
+
+        self.rect = rect
+        self.pointlist = [rect.topleft, rect.topright, rect.bottomright, rect.bottomleft]
+        self.x = x
+        self.y = y
+        self.width = w
+        self.height = h
+
         self.rotation = rot
         if log:
             self.logger = logging.getLogger("world.{}".format(self.identifier))
@@ -31,8 +39,17 @@ class Entity():
             self.logger.info("created entity")
 
     def move(self, x_delta, y_delta):
-        rect = self.rect
-        self.rect.center = (rect.centerx + x_delta, rect.centery + y_delta)
+        self.x += x_delta
+        self.y += y_delta
+        self.update_rect()
+
+        pointlist = []
+        for point in self.pointlist:
+            point = list(point)
+            new_point = (point[0] + x_delta, point[1] + y_delta)
+            pointlist.append(new_point)
+        
+        self.pointlist = pointlist
 
     def rotate(self, degrees):
         self.rotation += degrees
@@ -52,44 +69,63 @@ class Entity():
         else:
             return 0
         
-    def get_area(self) :
-        return self.rect.width * self.rect.height 
+    def get_area(self):
+        return self.width * self.height 
 
-    # gets the rotation of a given point
+    def update_rect(self):
+        rect = pygame.Rect(0, 0, self.width, self.height)
+        rect.center = (self.x, self.y)
+
+        self.rect = rect
+
     def rotate_point(self, point):
-        rotation_radians = math.radians(self.rotation)
-        x_pos = self.rect.centerx
-        y_pos = self.rect.centery
-        x0 = point[self.COORDINATE_X] - x_pos
-        y0 = point[self.COORDINATE_Y] - y_pos
-        x1 = math.cos(rotation_radians) * x0 + x_pos
-        y1 = math.sin(rotation_radians) * y0 + y_pos
-        print("x_pos : " + str(x_pos) + "x0" + str(x0 + x_pos) + "x1" + str(x1))
-        print("y_pos : " + str(y_pos) + "y0" + str(y0 + y_pos) + "y1" + str(y1))
-        return (x1, y1)
+        rotation_angle = math.radians(self.rotation)
+
+        s = math.sin(rotation_angle)
+        c = math.cos(rotation_angle)
+
+        point = list(point)
+        print(point)
+
+        point[self.COORDINATE_X] -= self.x
+        point[self.COORDINATE_Y] -= self.y
+
+        x_new = point[self.COORDINATE_X] * c - point[self.COORDINATE_Y] * s
+        y_new = point[self.COORDINATE_X] * s + point[self.COORDINATE_Y] * c
+
+        point[self.COORDINATE_X] = x_new + self.x
+        point[self.COORDINATE_Y] = y_new + self.y
+
+        print(point)
+        return tuple(point)
 
     def rotate_rect_points(self):
-        rect = self.rect
+        tl, tr, br, bl = self.pointlist
 
-        rect.topleft = self.rotate_point(rect.topleft)
-        rect.topright = self.rotate_point(rect.topright)
-        rect.bottomleft = self.rotate_point(rect.bottomleft)
-        rect.bottomright = self.rotate_point(rect.bottomright)
+        tl = self.rotate_point(self.rect.topleft)
+        tr = self.rotate_point(self.rect.topright)
+        br = self.rotate_point(self.rect.bottomright)
+        bl = self.rotate_point(self.rect.bottomleft)
 
+        self.pointlist = [tl, tr, br, bl]
 
 
 class Bullet(Entity):
     def __init__(self, x, y, dir):
         Entity.__init__(self, "bullet", x, y, BULLET_WIDTH, BULLET_HEIGHT, dir)
+        print(self.pointlist)
 
     def move(self):
         rotation_radians = math.radians(self.rotation)
-        self.rect.centerx -= BULLET_MOVEMENT*math.sin(rotation_radians)
-        self.rect.centery -= BULLET_MOVEMENT*math.cos(rotation_radians)
+        self.x -= BULLET_MOVEMENT*math.sin(rotation_radians)
+        self.y -= BULLET_MOVEMENT*math.cos(rotation_radians)
+        self.update_rect()
+        self.pointlist = [self.rect.topleft, self.rect.topright, self.rect.bottomright, self.rect.bottomleft]
+
 
 class Gun(Entity):
     def __init__(self, ship):
-        Entity.__init__(self, "gun", ship.rect.centerx, ship.rect.centery, GUN_WIDTH, GUN_HEIGHT, 0)
+        Entity.__init__(self, "gun", ship.x, ship.y, GUN_WIDTH, GUN_HEIGHT, 0)
         print("Gun built")
 
 class Ship(Entity):
