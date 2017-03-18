@@ -13,13 +13,20 @@ def draw_ship(screen, ship):
     ship_body = pygame.Rect(0, 0, ship.width, ship.height)
     ship_body.center = (ship.x_pos, ship.y_pos)
 
+    gun = ship.gun
+    gun_body = pygame.Rect(0, 0, gun.width, gun.height)
+    gun_body.center = (gun.x_pos, gun.y_pos)
+
     pygame.draw.rect(screen, GREEN, ship_body)
+    pygame.draw.rect(screen, RED, gun_body)
+
 
 running = True
 
 size = (1600, 900)
 GREEN = (0, 255,0)
 WHITE = (0,0,0)
+RED = (255, 0, 0)
 screen = pygame.display.set_mode(size)
 
 pygame.display.set_caption("Game.hs")

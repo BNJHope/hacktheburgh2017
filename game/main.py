@@ -1,7 +1,10 @@
 #!/usr/bin/python
 
-SHIP_WIDTH = 10
-SHIP_HEIGHT = 10
+SHIP_WIDTH = 50
+SHIP_HEIGHT = 50
+
+GUN_WIDTH = 5
+GUN_HEIGHT = 75
 
 class Entity():
     def __init__(self, identifier,  x, y, w, h, rot):
@@ -37,10 +40,22 @@ class Entity():
     def get_area(self) :
         return self.width * self.height
         
+
+class Gun(Entity):
+    def __init__(self, ship):
+        Entity.__init__(self, "gun", ship.x_pos, ship.y_pos, GUN_WIDTH, GUN_HEIGHT, 0)
+        print("Gun built")
+
 class Ship(Entity):
     def __init__(self, x, y):
-        Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT,  0)
+        Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT, 0)
+        self.gun = Gun(self)
+
         print("ship built")
+
+    def move(self, x_delta, y_delta):
+        Entity.move(self, x_delta, y_delta)
+        self.gun.move(x_delta, y_delta)
 
 class World():
     def __init__(self):
