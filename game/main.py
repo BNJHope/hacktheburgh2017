@@ -15,11 +15,12 @@ BULLET_HEIGHT = 5
 BULLET_MOVEMENT = 10
 
 class Entity():
-
-    COORDINATE_X = 0
-    COORDINATE_Y = 1
     
     def __init__(self, identifier,  x, y, w, h, rot, log=False):
+
+        self.COORDINATE_X = 0
+        self.COORDINATE_Y = 1
+       
         self.identifier = identifier
         self.rect = pygame.Rect(0, 0, w, h)
         self.rect.center = (x, y)
@@ -35,6 +36,7 @@ class Entity():
 
     def rotate(self, degrees):
         self.rotation += degrees
+        self.rotate_rect_points()
 
     def collides_with(self, other_entity):
         print("yeah fuck me dude it collides")
@@ -57,20 +59,31 @@ class Entity():
     def rotate_point(self, point):
         rotation_radians = math.radians(self.rotation)
         x_pos = self.rect.centerx
-        y_pos = self.rec.centery
-        x0 = point(COORDINATE_X) - x_pos
-        y0 = point(COORDINATE_Y) - y_pos
+        y_pos = self.rect.centery
+        x0 = point[self.COORDINATE_X] - x_pos
+        y0 = point[self.COORDINATE_Y] - y_pos
         x1 = math.cos(rotation_radians) * x0 + x_pos
         y1 = math.sin(rotation_radians) * y0 + y_pos
         return (x1, y1)
+
+    def rotate_rect_points(self):
+        rect = self.rect
+
+        rect.topleft = self.rotate_point(rect.topleft)
+        rect.topright = self.rotate_point(rect.topright)
+        rect.bottomleft = self.rotate_point(rect.bottomleft)
+        rect.bottomright = self.rotate_point(rect.bottomright)
+
+
 
 class Bullet(Entity):
     def __init__(self, x, y, dir):
         Entity.__init__(self, "bullet", x, y, BULLET_WIDTH, BULLET_HEIGHT, dir)
 
     def move(self):
-        self.rect.centerx -= BULLET_MOVEMENT*math.sin(self.rotation)
-        self.rect.centery -= BULLET_MOVEMENT*math.cos(self.rotation)
+        rotation_radians = math.radians(self.rotation)
+        self.rect.centerx -= BULLET_MOVEMENT*math.sin(rotation_radians)
+        self.rect.centery -= BULLET_MOVEMENT*math.cos(rotation_radians)
 
 class Gun(Entity):
     def __init__(self, ship):

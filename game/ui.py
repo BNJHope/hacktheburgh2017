@@ -64,11 +64,12 @@ while running:
             if event.dict["key"] == pygame.K_DOWN:
                 SHIP.move(0, MOVEMENT_CONSTANT)
             if event.dict["key"] == pygame.K_SPACE:
-                new_bullet = Bullet(SHIP.rect.centerx, SHIP.rect.centery, 0)
+                new_bullet = Bullet(SHIP.rect.centerx, SHIP.rect.centery, SHIP.rotation)
                 bullets.append(new_bullet)
             if event.dict["key"] == pygame.K_a:
-                new_bullet = Bullet(SHIP.rect.centerx, SHIP.rect.centery, 30)
-                bullets.append(new_bullet)
+                SHIP.rotate(5)
+            if event.dict["key"] == pygame.K_d:
+                SHIP.rotate(-5)
 
     draw_ship(screen, SHIP)
     draw_bullets(screen, bullets)
