@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 class Entity():
-    def __init__(self, x, y):
+    def __init__(self, identifier,  x, y):
+        self.identifier = identifier
         self.x_pos = x
         self.y_pos = y
         print("entity built")
@@ -11,8 +12,7 @@ class Entity():
 
 class Ship(Entity):
     def __init__(self, x, y):
-        Entity.__init__(self, x, y)
-        self.identifier = "ship"
+        Entity.__init__(self, "ship", x, y)
         print("ship built")
 
     def identify(self):
@@ -33,7 +33,6 @@ def main():
     world.register(Ship(100, 100))
     for e in world.entities:
         print(vars(e))
-        
 
 if __name__ == "__main__":
     main()
