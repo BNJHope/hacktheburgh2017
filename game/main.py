@@ -1,16 +1,24 @@
 #!/usr/bin/python
 
+import logging
+
 SHIP_WIDTH = 10
 SHIP_HEIGHT = 10
 
 class Entity():
-    def __init__(self, identifier,  x, y, w, h, rot):
+    def __init__(self, identifier,  x, y, w, h, rot, log=False):
         self.identifier = identifier
         self.x_pos = x
         self.y_pos = y
         self.width = w
         self.height = h
         self.rotation = rot
+        if log:
+            self.logger = logging.getLogger("world.{}".format(self.identifier))
+            self.logger.setLevel(logging.INFO)
+            self.logger.info("created entity")
+
+
 
     def move(self, x_delta, y_delta):
         self.x_pos = self.x_pos + x_delta
@@ -38,27 +46,27 @@ class Entity():
         return self.width * self.height
         
 class Ship(Entity):
-    def __init__(self, x, y):
-        Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT,  0)
-        print("ship built")
+    def __init__(self, x, y, log=False):
+        Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT,  0, log)
 
 class World():
-    def __init__(self):
-        print("Created world")
+    def __init__(self, log=False):
+        if log:
+            self.logger = logging.getLogger("world")
+            self.logger.setLevel(logging.INFO)
+            self.logger.info("created world")
+
         self.entities = []
 
     def register(self, entity):
         self.entities.append(entity)
+        if self.logger:
+            self.logger.info("registered entity: {}".format(entity.identifier))
 
 def main():
-    # logger = logging.getLogger(__name__)
-    # logger.setLevel(logging.INFO)
-    world = World()
-    world.register(Ship(100, 100))
-    for e in world.entities:
-        print(vars(e))
-        e.rotate(90)
-        print(vars(e))
+    logging.basicConfig()
+    world = World(log=True)
+    world.register(Ship(100, 100, log=True))
 
 if __name__ == "__main__":
     main()
