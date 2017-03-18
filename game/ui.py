@@ -9,21 +9,26 @@ def move_poly(polygon, x, y):
 
     return polygon
 
+def draw_entity(screen, colour, entity):
+    entity_body = pygame.Rect(0, 0, entity.width, entity.height)
+    entity_body.center = (entity.x_pos, entity.y_pos)
+
+    pygame.draw.rect(screen, colour, entity_body)
+
 def draw_ship(screen, ship):
-    ship_body = pygame.Rect(0, 0, ship.width, ship.height)
-    ship_body.center = (ship.x_pos, ship.y_pos)
+    draw_entity(screen, GREEN, ship)
+    draw_entity(screen, RED, ship.gun)
 
-    gun = ship.gun
-    gun_body = pygame.Rect(0, 0, gun.width, gun.height)
-    gun_body.center = (gun.x_pos, gun.y_pos)
-
-    pygame.draw.rect(screen, GREEN, ship_body)
-    pygame.draw.rect(screen, RED, gun_body)
-
+def draw_bullets(screen, bullets):
+    for bullet in bullets:
+        draw_entity(screen, RED, bullet)
 
 running = True
 
-size = (1600, 900)
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 900
+
+size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 GREEN = (0, 255,0)
 WHITE = (0,0,0)
 RED = (255, 0, 0)
@@ -34,10 +39,17 @@ pygame.display.set_caption("Game.hs")
 SHIP = Ship(800, 850)
 MOVEMENT_CONSTANT = 50
 
-print(pygame.QUIT)
+clock = pygame.time.Clock()
+
+bullets = []
 
 while running:
     screen.fill(WHITE)
+
+    for bullet in bullets:
+        bullet.move()
+        if bullet.y_pos < 0 or bullet.y_pos > SCREEN_HEIGHT:
+            bullets.remove(bullet)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -51,9 +63,15 @@ while running:
                 SHIP.move(0, -MOVEMENT_CONSTANT)
             if event.dict["key"] == pygame.K_DOWN:
                 SHIP.move(0, MOVEMENT_CONSTANT)
+            if event.dict["key"] == pygame.K_SPACE:
+                new_bullet = Bullet(SHIP.x_pos, SHIP.y_pos, 0)
+                bullets.append(new_bullet)
 
     draw_ship(screen, SHIP)
+    draw_bullets(screen, bullets)
 
-    pygame.display.flip()
+    pygame.display.update()
+
+    clock.tick(60)
 
 pygame.quit()

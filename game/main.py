@@ -6,6 +6,10 @@ SHIP_HEIGHT = 50
 GUN_WIDTH = 5
 GUN_HEIGHT = 75
 
+BULLET_WIDTH = 3
+BULLET_HEIGHT = 7
+BULLET_MOVEMENT = 10
+
 class Entity():
     def __init__(self, identifier,  x, y, w, h, rot):
         self.identifier = identifier
@@ -38,8 +42,16 @@ class Entity():
             return 0
             
     def get_area(self) :
-        return self.width * self.height
-        
+        return self.width * self.height 
+
+
+class Bullet(Entity):
+    def __init__(self, x, y, dir):
+        Entity.__init__(self, "bullet", x, y, BULLET_WIDTH, BULLET_HEIGHT, 0)
+        self.direction = dir
+
+    def move(self):
+        self.y_pos -= BULLET_MOVEMENT
 
 class Gun(Entity):
     def __init__(self, ship):
