@@ -7,6 +7,11 @@ GUN_WIDTH = 5
 GUN_HEIGHT = 75
 
 class Entity():
+
+    COORDINATE_X = 0
+
+    COORDINATE_Y = 1
+    
     def __init__(self, identifier,  x, y, w, h, rot):
         self.identifier = identifier
         self.x_pos = x
@@ -39,8 +44,16 @@ class Entity():
             
     def get_area(self) :
         return self.width * self.height
-        
 
+    # gets the rotation of a given point
+    def rotate_point(self, point):
+        rotation_radians = math.radians(self.rotation)
+        x0 = point(COORDINATE_X) - self.x_pos
+        y0 = point(COORDINATE_Y) - self.y_pos
+        x1 = math.cos(rotation_radians) * x0 + self.x_pos
+        y1 = math.sin(rotation_radians) * y0 + self.y_pos
+        return (x1, y1)
+       
 class Gun(Entity):
     def __init__(self, ship):
         Entity.__init__(self, "gun", ship.x_pos, ship.y_pos, GUN_WIDTH, GUN_HEIGHT, 0)
