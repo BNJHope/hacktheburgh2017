@@ -1,42 +1,52 @@
 import pygame
+import math
+from main import *
+
+def move_poly(polygon, x, y):
+    for points in polygon:
+        points[0] += x
+        points[1] += y
+
+    return polygon
+
+def draw_ship(screen, ship):
+    ship_body = pygame.Rect(0, 0, ship.width, ship.height)
+    ship_body.center = (ship.x_pos, ship.y_pos)
+
+    pygame.draw.rect(screen, GREEN, ship_body)
 
 running = True
 
-size = (700, 500)
+size = (1600, 900)
 GREEN = (0, 255,0)
 WHITE = (0,0,0)
 screen = pygame.display.set_mode(size)
 
-pygame.display.set_caption("Game.java")
+pygame.display.set_caption("Game.hs")
 
-SHIP = pygame.Rect(50,50,100,100)
-pygame.draw.rect(screen, GREEN, SHIP)
+SHIP = Ship(800, 850)
+MOVEMENT_CONSTANT = 50
 
 print(pygame.QUIT)
 
 while running:
-	screen.fill(WHITE)
+    screen.fill(WHITE)
 
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			running = False
-		if event.type == pygame.KEYUP:
-			if event.dict["key"] == pygame.K_LEFT:
-				print("Move left")
-				SHIP.move_ip(-100,0)
-			if event.dict["key"] == pygame.K_RIGHT:
-				SHIP.move_ip(100,0)
-				print("Move right")
-		# if event.dict == pygame.K_LEFT:
-		# 	SHIP.move(10,0)
-		# if event.type == pygame.KEYRIGHT:
-		# 	SHIP.move(-10,0)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event.dict["key"] == pygame.K_LEFT:
+                SHIP.move(-MOVEMENT_CONSTANT, 0)
+            if event.dict["key"] == pygame.K_RIGHT:
+                SHIP.move(MOVEMENT_CONSTANT,0)
+            if event.dict["key"] == pygame.K_UP:
+                SHIP.move(0, -MOVEMENT_CONSTANT)
+            if event.dict["key"] == pygame.K_DOWN:
+                SHIP.move(0, MOVEMENT_CONSTANT)
 
-		# print(event)
-		# print(event.dict)
+    draw_ship(screen, SHIP)
 
-	pygame.draw.rect(screen, GREEN, SHIP)
-
-	pygame.display.flip()
+    pygame.display.flip()
 
 pygame.quit()
