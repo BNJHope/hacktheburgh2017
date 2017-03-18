@@ -64,6 +64,8 @@ class Entity():
         y0 = point[self.COORDINATE_Y] - y_pos
         x1 = math.cos(rotation_radians) * x0 + x_pos
         y1 = math.sin(rotation_radians) * y0 + y_pos
+        print("x_pos : " + str(x_pos) + "x0" + str(x0 + x_pos) + "x1" + str(x1))
+        print("y_pos : " + str(y_pos) + "y0" + str(y0 + y_pos) + "y1" + str(y1))
         return (x1, y1)
 
     def rotate_rect_points(self):
