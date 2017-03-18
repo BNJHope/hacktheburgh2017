@@ -19,7 +19,24 @@ class Entity():
     def rotate(self, degrees):
         self.rotation += degrees
 
+    def collides_with(self, other_entity):
+        print("yeah fuck me dude it collides")
 
+    def compare_size(self, other_entity):
+
+        self_size = self.get_area()
+        other_size = other_entity.get_area()
+        
+        if(self_size > other_size):
+            return 1
+        elif(self_size < other_size):
+            return -1
+        else:
+            return 0
+            
+    def get_area(self) :
+        return self.width * self.height
+        
 class Ship(Entity):
     def __init__(self, x, y):
         Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT,  0)
