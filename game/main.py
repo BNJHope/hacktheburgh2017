@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import logging
+
 SHIP_WIDTH = 50
 SHIP_HEIGHT = 50
 
@@ -11,13 +13,24 @@ BULLET_HEIGHT = 7
 BULLET_MOVEMENT = 10
 
 class Entity():
-    def __init__(self, identifier,  x, y, w, h, rot):
+
+    COORDINATE_X = 0
+
+    COORDINATE_Y = 1
+    
+    def __init__(self, identifier,  x, y, w, h, rot, log=False):
         self.identifier = identifier
         self.x_pos = x
         self.y_pos = y
         self.width = w
         self.height = h
         self.rotation = rot
+        if log:
+            self.logger = logging.getLogger("world.{}".format(self.identifier))
+            self.logger.setLevel(logging.INFO)
+            self.logger.info("created entity")
+
+
 
     def move(self, x_delta, y_delta):
         self.x_pos = self.x_pos + x_delta
@@ -40,10 +53,18 @@ class Entity():
             return -1
         else:
             return 0
-            
+        
     def get_area(self) :
         return self.width * self.height 
 
+    # gets the rotation of a given point
+    def rotate_point(self, point):
+        rotation_radians = math.radians(self.rotation)
+        x0 = point(COORDINATE_X) - self.x_pos
+        y0 = point(COORDINATE_Y) - self.y_pos
+        x1 = math.cos(rotation_radians) * x0 + self.x_pos
+        y1 = math.sin(rotation_radians) * y0 + self.y_pos
+        return (x1, y1)
 
 class Bullet(Entity):
     def __init__(self, x, y, dir):
@@ -59,33 +80,32 @@ class Gun(Entity):
         print("Gun built")
 
 class Ship(Entity):
-    def __init__(self, x, y):
-        Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT, 0)
+    def __init__(self, x, y, log=False):
+        Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT, 0, log)
         self.gun = Gun(self)
-
-        print("ship built")
 
     def move(self, x_delta, y_delta):
         Entity.move(self, x_delta, y_delta)
         self.gun.move(x_delta, y_delta)
 
 class World():
-    def __init__(self):
-        print("Created world")
+    def __init__(self, log=False):
+        if log:
+            self.logger = logging.getLogger("world")
+            self.logger.setLevel(logging.INFO)
+            self.logger.info("created world")
+
         self.entities = []
 
     def register(self, entity):
         self.entities.append(entity)
+        if self.logger:
+            self.logger.info("registered entity: {}".format(entity.identifier))
 
 def main():
-    # logger = logging.getLogger(__name__)
-    # logger.setLevel(logging.INFO)
-    world = World()
-    world.register(Ship(100, 100))
-    for e in world.entities:
-        print(vars(e))
-        e.rotate(90)
-        print(vars(e))
+    logging.basicConfig()
+    world = World(log=True)
+    world.register(Ship(100, 100, log=True))
 
 if __name__ == "__main__":
     main()
