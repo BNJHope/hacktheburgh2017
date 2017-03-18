@@ -16,12 +16,12 @@ def draw_entity(screen, colour, entity):
     pygame.draw.rect(screen, colour, entity_body)
 
 def draw_ship(screen, ship):
-    draw_entity(screen, GREEN, ship)
-    draw_entity(screen, RED, ship.gun)
+    pygame.draw.rect(screen, GREEN, ship.rect)
+    pygame.draw.rect(screen, RED, ship.gun.rect)
 
 def draw_bullets(screen, bullets):
     for bullet in bullets:
-        draw_entity(screen, RED, bullet)
+        pygame.draw.rect(screen, RED, bullet.rect)
 
 running = True
 
@@ -48,7 +48,7 @@ while running:
 
     for bullet in bullets:
         bullet.move()
-        if bullet.y_pos < 0 or bullet.y_pos > SCREEN_HEIGHT:
+        if bullet.rect.centery < 0 or bullet.rect.centery > SCREEN_HEIGHT:
             bullets.remove(bullet)
 
     for event in pygame.event.get():
@@ -64,7 +64,10 @@ while running:
             if event.dict["key"] == pygame.K_DOWN:
                 SHIP.move(0, MOVEMENT_CONSTANT)
             if event.dict["key"] == pygame.K_SPACE:
-                new_bullet = Bullet(SHIP.x_pos, SHIP.y_pos, 0)
+                new_bullet = Bullet(SHIP.rect.centerx, SHIP.rect.centery, 0)
+                bullets.append(new_bullet)
+            if event.dict["key"] == pygame.K_a:
+                new_bullet = Bullet(SHIP.rect.centerx, SHIP.rect.centery, 30)
                 bullets.append(new_bullet)
 
     draw_ship(screen, SHIP)

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import logging
+import math
+import pygame
 
 SHIP_WIDTH = 50
 SHIP_HEIGHT = 50
@@ -8,33 +10,28 @@ SHIP_HEIGHT = 50
 GUN_WIDTH = 5
 GUN_HEIGHT = 75
 
-BULLET_WIDTH = 3
-BULLET_HEIGHT = 7
+BULLET_WIDTH = 5
+BULLET_HEIGHT = 5
 BULLET_MOVEMENT = 10
 
 class Entity():
 
     COORDINATE_X = 0
-
     COORDINATE_Y = 1
     
     def __init__(self, identifier,  x, y, w, h, rot, log=False):
         self.identifier = identifier
-        self.x_pos = x
-        self.y_pos = y
-        self.width = w
-        self.height = h
+        self.rect = pygame.Rect(0, 0, w, h)
+        self.rect.center = (x, y)
         self.rotation = rot
         if log:
             self.logger = logging.getLogger("world.{}".format(self.identifier))
             self.logger.setLevel(logging.INFO)
             self.logger.info("created entity")
 
-
-
     def move(self, x_delta, y_delta):
-        self.x_pos = self.x_pos + x_delta
-        self.y_pos = self.y_pos + y_delta
+        rect = self.rect
+        self.rect.center = (rect.centerx + x_delta, rect.centery + y_delta)
 
     def rotate(self, degrees):
         self.rotation += degrees
@@ -43,7 +40,6 @@ class Entity():
         print("yeah fuck me dude it collides")
 
     def compare_size(self, other_entity):
-
         self_size = self.get_area()
         other_size = other_entity.get_area()
         
@@ -55,28 +51,30 @@ class Entity():
             return 0
         
     def get_area(self) :
-        return self.width * self.height 
+        return self.rect.width * self.rect.height 
 
     # gets the rotation of a given point
     def rotate_point(self, point):
         rotation_radians = math.radians(self.rotation)
-        x0 = point(COORDINATE_X) - self.x_pos
-        y0 = point(COORDINATE_Y) - self.y_pos
-        x1 = math.cos(rotation_radians) * x0 + self.x_pos
-        y1 = math.sin(rotation_radians) * y0 + self.y_pos
+        x_pos = self.rect.centerx
+        y_pos = self.rec.centery
+        x0 = point(COORDINATE_X) - x_pos
+        y0 = point(COORDINATE_Y) - y_pos
+        x1 = math.cos(rotation_radians) * x0 + x_pos
+        y1 = math.sin(rotation_radians) * y0 + y_pos
         return (x1, y1)
 
 class Bullet(Entity):
     def __init__(self, x, y, dir):
-        Entity.__init__(self, "bullet", x, y, BULLET_WIDTH, BULLET_HEIGHT, 0)
-        self.direction = dir
+        Entity.__init__(self, "bullet", x, y, BULLET_WIDTH, BULLET_HEIGHT, dir)
 
     def move(self):
-        self.y_pos -= BULLET_MOVEMENT
+        self.rect.centerx -= BULLET_MOVEMENT*math.sin(self.rotation)
+        self.rect.centery -= BULLET_MOVEMENT*math.cos(self.rotation)
 
 class Gun(Entity):
     def __init__(self, ship):
-        Entity.__init__(self, "gun", ship.x_pos, ship.y_pos, GUN_WIDTH, GUN_HEIGHT, 0)
+        Entity.__init__(self, "gun", ship.rect.centerx, ship.rect.centery, GUN_WIDTH, GUN_HEIGHT, 0)
         print("Gun built")
 
 class Ship(Entity):
