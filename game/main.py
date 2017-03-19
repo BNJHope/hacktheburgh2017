@@ -50,21 +50,7 @@ class Entity():
 
     def collides_with(self, other_entity):
         return self.rect.colliderect(other_entity.rect)
-            
-    # return 1 if the entity is larger in
-    # area than the given entity, 0 if equal
-    # -1 if smaller
-    def compare_size(self, other_entity):
-        self_size = self.get_area()
-        other_size = other_entity.get_area()
-        
-        if(self_size > other_size):
-            return 1
-        elif(self_size < other_size):
-            return -1
-        else:
-            return 0
-        
+       
     def get_area(self):
         return self.width * self.height 
 

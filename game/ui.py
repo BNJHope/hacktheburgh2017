@@ -4,6 +4,9 @@ from main import *
 from random import randint
 import random
 
+
+pygame.mixer.init(44100, -16, 2, 2048)
+pew = pygame.mixer.Sound('pew.wav')
 pygame.font.init()
 
 enemy1 = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
@@ -130,7 +133,6 @@ while pygame.event.poll().type != pygame.KEYDOWN:
 init()
 
 while running:
-
     if gameover:
         screen.blit(gameover_screen, (0,0))
         label = font.render("Final score: " + str(score), 1, WHITE)
@@ -220,6 +222,5 @@ while running:
         clock.tick(60)
 
         score += 1
-
 
 pygame.quit()
