@@ -60,7 +60,7 @@ WHITE = (0,0,0)
 RED = (255, 0, 0)
 screen = pygame.display.set_mode(size)
 
-pygame.display.set_caption("Game.hs")
+pygame.display.set_caption("Game.hsii")
 
 SHIP = Ship(800, 850)
 MOVEMENT_CONSTANT = 50
@@ -96,13 +96,13 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.dict["key"] == pygame.K_LEFT:
+            if event.dict["key"] == pygame.K_j:
                 SHIP.move(-MOVEMENT_CONSTANT, 0)
-            if event.dict["key"] == pygame.K_RIGHT:
+            if event.dict["key"] == pygame.K_l:
                 SHIP.move(MOVEMENT_CONSTANT,0)
-            if event.dict["key"] == pygame.K_UP:
+            if event.dict["key"] == pygame.K_i:
                 SHIP.move(0, -MOVEMENT_CONSTANT)
-            if event.dict["key"] == pygame.K_DOWN:
+            if event.dict["key"] == pygame.K_k:
                 SHIP.move(0, MOVEMENT_CONSTANT)
             if event.dict["key"] == pygame.K_SPACE:
                 new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
