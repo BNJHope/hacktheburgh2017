@@ -22,15 +22,12 @@ class Entity():
         self.COORDINATE_Y = 1
         self.identifier = identifier
 
-        rect = pygame.Rect(0, 0, w, h)
-        rect.center = (x, y)
-
-        self.rect = rect
-        self.pointlist = [rect.topleft, rect.topright, rect.bottomright, rect.bottomleft]
         self.x = x
         self.y = y
         self.width = w
         self.height = h
+
+        self.update_position()
 
         self.rotation = rot
         if log:
@@ -41,15 +38,7 @@ class Entity():
     def move(self, x_delta, y_delta):
         self.x += x_delta
         self.y += y_delta
-        self.update_rect()
-
-        pointlist = []
-        for point in self.pointlist:
-            point = list(point)
-            new_point = (point[0] + x_delta, point[1] + y_delta)
-            pointlist.append(new_point)
-        
-        self.pointlist = pointlist
+        self.update_position()
 
     def rotate(self, degrees):
         self.rotation += degrees
@@ -72,11 +61,18 @@ class Entity():
     def get_area(self):
         return self.width * self.height 
 
+    def update_position(self):
+        self.update_rect()
+        self.update_pointlist();
+
     def update_rect(self):
         rect = pygame.Rect(0, 0, self.width, self.height)
         rect.center = (self.x, self.y)
 
         self.rect = rect
+
+    def update_pointlist(self):
+        self.pointlist = [self.rect.topleft, self.rect.topright, self.rect.bottomright, self.rect.bottomleft]
 
     def rotate_point(self, point):
         rotation_angle = math.radians(self.rotation)
@@ -119,8 +115,7 @@ class Bullet(Entity):
         rotation_radians = math.radians(self.rotation)
         self.x -= BULLET_MOVEMENT*math.sin(rotation_radians)
         self.y -= BULLET_MOVEMENT*math.cos(rotation_radians)
-        self.update_rect()
-        self.pointlist = [self.rect.topleft, self.rect.topright, self.rect.bottomright, self.rect.bottomleft]
+        self.update_position()
 
 
 class Gun(Entity):
@@ -136,6 +131,7 @@ class Ship(Entity):
     def move(self, x_delta, y_delta):
         Entity.move(self, x_delta, y_delta)
         self.gun.move(x_delta, y_delta)
+        self.gun.rotate_rect_points()
 
 class World():
     def __init__(self, log=False):
