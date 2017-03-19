@@ -73,13 +73,21 @@ enemies = []
 while running:
     screen.fill(WHITE)
 
-    if randint(0, 15) == 0:
+    if randint(0, 50) == 0:
         enemies.append(generate_enemy(SHIP))
 
     for bullet in bullets:
         bullet.move()
         if bullet.y < 0 or bullet.y > SCREEN_HEIGHT:
             bullets.remove(bullet)
+        else:        
+            for enemy in enemies:
+                if bullet.collides_with(enemy):
+                    bullets.remove(bullet)
+                    enemies.remove(enemy)
+                    break
+
+
 
     for enemy in enemies:
         enemy.move()
