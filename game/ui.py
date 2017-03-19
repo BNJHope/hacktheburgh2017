@@ -1,6 +1,8 @@
 import pygame
 import math
 from main import *
+from random import randint
+import random
 
 def move_poly(polygon, x, y):
     for points in polygon:
@@ -17,14 +19,40 @@ def draw_ship(screen, ship):
     draw_entity(screen, RED, ship.gun)
     # pygame.draw.rect(screen, RED, ship.gun.rect)
 
-def draw_bullets(screen, bullets):
-    for bullet in bullets:
-        draw_entity(screen, RED, bullet)
+def draw_entities(screen, colour, entities):
+    for entity in entities:
+        draw_entity(screen, colour, entity)
 
 running = True
 
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 900
+
+def make_wall(x_min, x_max, y_min, y_max):
+    return {
+        "x_min": x_min,
+        "x_max": x_max,
+        "y_min": y_min,
+        "y_max": y_max, 
+    }
+
+def create_enemy(wall, player_ship):
+    x = randint(wall["x_min"], wall["x_max"])
+    y = randint(wall["y_min"], wall["y_max"])
+
+    return Enemy(x, y, player_ship.x, player_ship.y)
+
+def generate_enemy(player_ship):
+    walls = {
+        "up": make_wall(0, SCREEN_WIDTH, 0, 0),
+        "right": make_wall(SCREEN_WIDTH, SCREEN_WIDTH, 0, SCREEN_HEIGHT),
+        "down": make_wall(0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_HEIGHT),
+        "left": make_wall(0, 0, 0, SCREEN_HEIGHT)
+    }
+
+    wall = random.choice(list(walls.items()))[1]
+
+    return create_enemy(wall, player_ship)
 
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 GREEN = (0, 255,0)
@@ -40,14 +68,21 @@ MOVEMENT_CONSTANT = 50
 clock = pygame.time.Clock()
 
 bullets = []
+enemies = []
 
 while running:
     screen.fill(WHITE)
+
+    if randint(0, 15) == 0:
+        enemies.append(generate_enemy(SHIP))
 
     for bullet in bullets:
         bullet.move()
         if bullet.y < 0 or bullet.y > SCREEN_HEIGHT:
             bullets.remove(bullet)
+
+    for enemy in enemies:
+        enemy.move()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -70,7 +105,8 @@ while running:
                 SHIP.gun.rotate(5)
 
     draw_ship(screen, SHIP)
-    draw_bullets(screen, bullets)
+    draw_entities(screen, RED, bullets)
+    draw_entities(screen, RED, enemies)
 
     pygame.display.update()
 

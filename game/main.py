@@ -141,13 +141,13 @@ class Ship(Entity):
 
 class Enemy(Entity):
     def __init__(self, x, y, target_x, target_y):
-        Entity.__init__(self, "enemy", x, y, ENEMY_WIDTH, ENEMY_HEIGHT)
+        Entity.__init__(self, "enemy", x, y, ENEMY_WIDTH, ENEMY_HEIGHT, 0)
         
         self.target_x = target_x
         self.target_y = target_y
 
     def move(self):
-        dx, dy = (target_x - x, target_y - y)
+        dx, dy = (self.target_x - self.x, self.target_y - self.y)
         stepx, stepy = (dx / 20.0, dy / 20.0)
 
         Entity.move(self, stepx, stepy)
