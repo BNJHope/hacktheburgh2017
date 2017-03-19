@@ -108,7 +108,6 @@ while running:
             enemies.remove(enemy)
 
     for event in pygame.event.get():
-        pygame.display.update()
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
