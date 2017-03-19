@@ -6,16 +6,11 @@ import random
 
 
 pygame.mixer.init(44100, -16, 2, 2048)
-pew = pygame.mixer.Sound('pew.wav')
+pew = pygame.mixer.Sound("../sfx/pew.wav")
+reload_sound = pygame.mixer.Sound("../sfx/reload.wav")
+explosion = pygame.mixer.Sound("../sfx/exp2.wav")
+noammo = pygame.mixer.Sound("../sfx/noammo.wav")
 pygame.font.init()
-
-enemy1 = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
-enemy2 = pygame.transform.scale(pygame.image.load("../imgs/enemy2.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
-background = pygame.image.load("../imgs/background.png")
-gameover_screen = pygame.image.load("../imgs/gameover.png")
-
-enemy_surfaces = [enemy1, enemy2]
-
 
 def move_poly(polygon, x, y):
     for points in polygon:
@@ -24,12 +19,21 @@ def move_poly(polygon, x, y):
 
     return polygon
 
+def rot_center(image, center, angle):
+    """rotate an image while keeping its center and size"""
+    orig_rect = image.get_rect()
+    rot_image = pygame.transform.rotate(image, angle)
+    rot_rect = orig_rect.copy()
+    rot_rect.center = rot_image.get_rect().center
+    rot_image = rot_image.subsurface(rot_rect).copy()
+    return rot_image
+
 def draw_entity(screen, colour, entity):
     pygame.draw.polygon(screen, colour, entity.pointlist)
 
 def draw_ship(screen, ship):
-    draw_entity(screen, GREEN, ship)
-    draw_entity(screen, RED, ship.gun)
+    screen.blit(ship_img, ship)
+    screen.blit(cannon, ship)
     # pygame.draw.rect(screen, RED, ship.gun.rect)
 
 def draw_enemy(screen, enemy):
@@ -82,6 +86,33 @@ def generate_enemy(player_ship):
 
     return create_enemy(wall, player_ship)
 
+def rotate_point(x, y, point):
+    rotation_angle = math.radians(self.rotation)
+
+    s = math.sin(rotation_angle)
+    c = math.cos(rotation_angle)
+
+    point = list(point)
+
+    point[0] -= x
+    point[1] -= y
+
+    x_new = point[0] * c - point[1] * s
+    y_new = point[0] * s + point[1] * c
+
+    point[0] = x_new + x
+    point[1] = y_new + y
+
+    return tuple(point)
+
+def rotate_rect_points(rect):
+
+    tl = rotate_point(rect.centerx, rect.centery, rect.topleft)
+    tr = rotate_point(rect.centerx, rect.centery, rect.topright)
+    br = rotate_point(rect.centerx, rect.centery, rect.bottomright)
+    bl = rotate_point(rect.centerx, rect.centery, rect.bottomleft)
+
+    return (tl, tr, br, bl)
 
 font = pygame.font.SysFont("monospace", 36)
 
@@ -104,6 +135,14 @@ reload_timer = 20
 clock = pygame.time.Clock()
 
 def init():
+    global ship_img
+    global cannon
+    global enemy1
+    global enemy2
+    global background
+    global gameover_screen
+    global start_screen
+    global enemy_surfaces 
     global score
     score = 0
 
@@ -126,11 +165,24 @@ def init():
     hp = pygame.Rect(0, 0, HP_WIDTH, HP_HEIGHT)
     hp.center = (400, 50)
 
+    ship_img = pygame.transform.scale(pygame.image.load("../imgs/ship.png"), (SHIP_WIDTH, SHIP_HEIGHT))
+    cannon = pygame.transform.scale(pygame.image.load("../imgs/cannon.png"), (GUN_WIDTH, GUN_HEIGHT))
+    enemy1 = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
+    enemy2 = pygame.transform.scale(pygame.image.load("../imgs/enemy2.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
+    background = pygame.image.load("../imgs/background.png")
+    gameover_screen = pygame.transform.scale(pygame.image.load("../imgs/gameover.png"), (1600, 900))
+    start_screen = pygame.transform.scale(pygame.image.load("../imgs/start.png"), (1600, 900))
+
+    enemy_surfaces = [enemy1, enemy2]
+
+init()
+
+screen.blit(start_screen, (0,0))
+pygame.display.update()
 
 while pygame.event.poll().type != pygame.KEYDOWN:
     pass
 
-init()
 
 while running:
     if gameover:
@@ -161,6 +213,7 @@ while running:
             else:        
                 for enemy in enemies:
                     if bullet.collides_with(enemy):
+                        explosion.play()
                         score += 200
                         bullets.remove(bullet)
                         enemies.remove(enemy)
@@ -172,9 +225,10 @@ while running:
             if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
                 enemies.remove(enemy)
             if enemy.collides_with(SHIP):
+                explosion.play()
                 enemies.remove(enemy)
                 hp.width -= 60
-                if hp.width < 0:
+                if hp.width <= 0:
                     gameover = True
 
 
@@ -192,17 +246,23 @@ while running:
                     SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if event.dict["key"] == pygame.K_x:
                     if SHIP.gun.ammo <= 0:
+                        noammo.play()
                         print("No ammo")
                     else:
                         new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                         bullets.append(new_bullet)
                         SHIP.gun.shoot()
+                        pew.play()
                 if event.dict["key"] == pygame.K_z:
                     reloading = True
+                    reload_sound.play()
                 if event.dict["key"] == pygame.K_a:
                     SHIP.gun.rotate(-5)
+                    cannon = rot_center(cannon, SHIP.rect.center, 5)
+
                 if event.dict["key"] == pygame.K_d:
                     SHIP.gun.rotate(5)
+                    cannon = rot_center(cannon, SHIP.rect.center, -5)
 
         if reloading:
             reload_timer -= 1
