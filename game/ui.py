@@ -4,6 +4,10 @@ from main import *
 from random import randint
 import random
 
+
+pygame.mixer.init(44100, -16, 2, 2048)
+pew = pygame.mixer.Sound('pew.wav')
+
 def move_poly(polygon, x, y):
     for points in polygon:
         points[0] += x
@@ -95,6 +99,29 @@ while running:
         if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
             enemies.remove(enemy)
 
+
+    print(len(enemies))
+
+    if randint(0, INVERSE_SPAWN_RATE) == 0:
+        enemies.append(generate_enemy(SHIP))
+
+    for bullet in bullets:
+        bullet.move()
+        if bullet.y < 0 or bullet.y > SCREEN_HEIGHT:
+            bullets.remove(bullet)
+        else:        
+            for enemy in enemies:
+                if bullet.collides_with(enemy):
+                    bullets.remove(bullet)
+                    enemies.remove(enemy)
+                    break
+
+
+    for enemy in enemies:
+        enemy.move()
+        if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
+            enemies.remove(enemy)
+
     for event in pygame.event.get():
         pygame.display.update()
         if event.type == pygame.QUIT:
@@ -109,6 +136,7 @@ while running:
             if event.dict["key"] == pygame.K_k:
                 SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_SPACE:
+                pew.play()
                 new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                 bullets.append(new_bullet)
             if event.dict["key"] == pygame.K_a:
