@@ -14,8 +14,9 @@ BULLET_WIDTH = 5
 BULLET_HEIGHT = 5
 BULLET_MOVEMENT = 10
 
-ENEMY_WIDTH = 25
-ENEMY_HEIGHT = 25
+ENEMY_WIDTH = 75
+ENEMY_HEIGHT = 75
+ENEMY_MOVEMENT = 120.0
 
 class Entity():
     
@@ -110,7 +111,15 @@ class Bullet(Entity):
 class Gun(Entity):
     def __init__(self, ship):
         Entity.__init__(self, "gun", ship.x, ship.y, GUN_WIDTH, GUN_HEIGHT, 0)
+        self.ammo = 25
         print("Gun built")
+
+    def shoot(self):
+        self.ammo -= 1
+
+    def reload(self):
+        self.ammo = 25
+
 
 class Ship(Entity):
     def __init__(self, x, y, log=False):
@@ -127,15 +136,16 @@ class Ship(Entity):
             self.gun.rotate_rect_points()
 
 class Enemy(Entity):
-    def __init__(self, x, y, target_x, target_y):
-        Entity.__init__(self, "enemy", x, y, ENEMY_WIDTH, ENEMY_HEIGHT, 0)
+    def __init__(self, x, y, target_x, target_y, rotation, surface):
+        Entity.__init__(self, "enemy", x, y, ENEMY_WIDTH, ENEMY_HEIGHT, rotation)
         
         self.target_x = target_x
         self.target_y = target_y
+        self.surface = surface
 
         dx, dy = (self.target_x - self.x, self.target_y - self.y)
-        self.stepx = dx / 75.0
-        self.stepy = dy / 75.0
+        self.stepx = dx / ENEMY_MOVEMENT
+        self.stepy = dy / ENEMY_MOVEMENT
 
     def move(self):
         Entity.move(self, self.stepx, self.stepy)
@@ -145,7 +155,7 @@ class World():
     def __init__(self, log=False):
         if log:
             self.logger = logging.getLogger("world")
-            self.logger.setLevel(logging.INFO)
+            self.logger.setLevel(logging.INFO)  
             self.logger.info("created world")
 
         self.entities = []
