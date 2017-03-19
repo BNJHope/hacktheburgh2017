@@ -124,7 +124,15 @@ class Bullet(Entity):
 class Gun(Entity):
     def __init__(self, ship):
         Entity.__init__(self, "gun", ship.x, ship.y, GUN_WIDTH, GUN_HEIGHT, 0)
+        self.ammo = 25
         print("Gun built")
+
+    def shoot(self):
+        self.ammo -= 1
+
+    def reload(self):
+        self.ammo = 25
+
 
 class Ship(Entity):
     def __init__(self, x, y, log=False):

@@ -68,6 +68,9 @@ INVERSE_SPAWN_RATE = 20
 
 clock = pygame.time.Clock()
 
+reloading = False
+reload_timer = 20
+
 bullets = []
 enemies = []
 
@@ -108,12 +111,26 @@ while running:
             if event.dict["key"] == pygame.K_k:
                 SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_SPACE:
-                new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
-                bullets.append(new_bullet)
+                if SHIP.gun.ammo <= 0:
+                    print("No ammo")
+                else:
+                    new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
+                    bullets.append(new_bullet)
+                    SHIP.gun.shoot()
+            if event.dict["key"] == pygame.K_r:
+                reloading = True
             if event.dict["key"] == pygame.K_a:
                 SHIP.gun.rotate(-5)
             if event.dict["key"] == pygame.K_d:
                 SHIP.gun.rotate(5)
+
+    if reloading:
+        reload_timer -= 1
+        print("reloading")
+        if reload_timer <= 0:
+            SHIP.gun.reload()
+            reload_timer = 20
+            reloading = False
 
     draw_ship(screen, SHIP)
     draw_entities(screen, RED, bullets)
