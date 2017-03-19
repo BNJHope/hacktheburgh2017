@@ -33,8 +33,7 @@ def draw_entity(screen, colour, entity):
 
 def draw_ship(screen, ship):
     screen.blit(ship_img, ship)
-    screen.blit(cannon, ship)
-    # pygame.draw.rect(screen, RED, ship.gun.rect)
+    draw_entity(screen, RED, ship.gun)
 
 def draw_enemy(screen, enemy):
     enemy_surface = pygame.transform.rotate(enemy.surface, -enemy.rotation)
@@ -62,6 +61,9 @@ def make_wall(x_min, x_max, y_min, y_max):
 def create_enemy(wall, player_ship):
     x = randint(wall["x_min"], wall["x_max"])
     y = randint(wall["y_min"], wall["y_max"])
+    
+    if player_ship.x == x:
+        x += 1
 
     m = (player_ship.y - y) / (player_ship.x - x)
     # print(str(x) + " : " + str(y))
@@ -128,6 +130,7 @@ pygame.display.set_caption("Game.idr")
 
 MOVEMENT_CONSTANT = 10
 INVERSE_SPAWN_RATE = 40
+NEXT_LIMIT_INC = 500
 
 reloading = False
 reload_timer = 20
@@ -144,7 +147,10 @@ def init():
     global start_screen
     global enemy_surfaces 
     global score
+    global next_limit
+
     score = 0
+    next_limit = NEXT_LIMIT_INC
 
     global SHIP
     SHIP = Ship(800, 850)
@@ -185,6 +191,13 @@ while pygame.event.poll().type != pygame.KEYDOWN:
 
 
 while running:
+    if score >= next_limit:
+        next_limit += NEXT_LIMIT_INC
+        if not ENEMY_MOVEMENT - 10 <= 0:
+            ENEMY_MOVEMENT -= 10.0
+        if not INVERSE_SPAWN_RATE - 3 <= 0:
+            INVERSE_SPAWN_RATE -= 3
+
     if gameover:
         screen.blit(gameover_screen, (0,0))
         label = font.render("Final score: " + str(score), 1, WHITE)
@@ -250,7 +263,9 @@ while running:
                         print("No ammo")
                     else:
                         new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
+                        new_bullet2 = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation + 180)
                         bullets.append(new_bullet)
+                        bullets.append(new_bullet2)
                         SHIP.gun.shoot()
                         pew.play()
                 if event.dict["key"] == pygame.K_z:
