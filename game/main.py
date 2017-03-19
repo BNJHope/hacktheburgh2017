@@ -150,10 +150,13 @@ class World():
         if self.logger:
             self.logger.info("registered entity: {}".format(entity.identifier))
 
-def main():
-    logging.basicConfig()
-    world = World(log=True)
-    world.register(Ship(100, 100, log=True))
+class Engine():
+    
+    def main():
+        logging.basicConfig()
+        world = World(log=True)
+        world.register(Ship(100, 100, log=True))
 
 if __name__ == "__main__":
-    main()
+    engine = Engine()
+    engine.main()
