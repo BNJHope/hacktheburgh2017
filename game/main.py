@@ -56,8 +56,11 @@ class Entity():
         self.rotate_rect_points()
 
     def collides_with(self, other_entity):
-        print("yeah fuck me dude it collides")
-
+        return self.rect.colliderect(other_entity.rect)
+            
+    # return 1 if the entity is larger in
+    # area than the given entity, 0 if equal
+    # -1 if smaller
     def compare_size(self, other_entity):
         self_size = self.get_area()
         other_size = other_entity.get_area()
