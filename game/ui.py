@@ -63,7 +63,7 @@ screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Game.hsii")
 
 SHIP = Ship(800, 850)
-MOVEMENT_CONSTANT = 50
+MOVEMENT_CONSTANT = 10
 INVERSE_SPAWN_RATE = 20
 
 clock = pygame.time.Clock()
@@ -100,13 +100,13 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.dict["key"] == pygame.K_j:
-                SHIP.move(-MOVEMENT_CONSTANT, 0)
+                SHIP.move(-MOVEMENT_CONSTANT, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_l:
-                SHIP.move(MOVEMENT_CONSTANT,0)
+                SHIP.move(MOVEMENT_CONSTANT,0, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_i:
-                SHIP.move(0, -MOVEMENT_CONSTANT)
+                SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_k:
-                SHIP.move(0, MOVEMENT_CONSTANT)
+                SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_SPACE:
                 new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                 bullets.append(new_bullet)
