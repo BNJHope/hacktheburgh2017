@@ -108,7 +108,7 @@ while running:
                 SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_k:
                 SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
-            if event.dict["key"] == pygame.K_SPACE:
+            if event.dict["key"] == pygame.K_x:
                 new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                 bullets.append(new_bullet)
             if event.dict["key"] == pygame.K_a:
