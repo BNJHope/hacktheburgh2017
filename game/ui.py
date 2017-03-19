@@ -6,7 +6,12 @@ import random
 
 pygame.font.init()
 
-enemy_ship_surface = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
+enemy1 = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
+enemy2 = pygame.transform.scale(pygame.image.load("../imgs/enemy2.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
+gameover_screen = pygame.image.load("../imgs/gameover.png")
+
+enemy_surfaces = [enemy1, enemy2]
+
 
 def move_poly(polygon, x, y):
     for points in polygon:
@@ -24,7 +29,7 @@ def draw_ship(screen, ship):
     # pygame.draw.rect(screen, RED, ship.gun.rect)
 
 def draw_enemy(screen, enemy):
-    enemy_surface = pygame.transform.rotate(enemy_ship_surface, enemy.rotation)
+    enemy_surface = pygame.transform.rotate(enemy.surface, enemy.rotation)
     screen.blit(enemy_surface, enemy)
     
 def draw_enemies(screen, enemies):
@@ -51,15 +56,23 @@ def create_enemy(wall, player_ship):
     y = randint(wall["y_min"], wall["y_max"])
 
     m = (player_ship.y - y) / (player_ship.x - x)
-    print(str(x) + " : " + str(y))
-    print("m: " + str(m))
+    # print(str(x) + " : " + str(y))
+    # print("m: " + str(m))
 
+    if x > player_ship.x and y < player_ship.y:
+        angle = 180 + math.degrees(math.atan2(x - player_ship.x,player_ship.y - y))
+    elif x > player_ship.x and y > player_ship.y:
+        angle = 180 + math.degrees(math.atan2(y - player_ship.y, x - player_ship.x))
+    elif x < player_ship.x and y > player_ship.y:
+        angle = math.degrees(math.atan2(player_ship.x - x, y - player_ship.y))
+    else :
+        angle = math.degrees(math.atan2(player_ship.y - y, player_ship.y - y))
 
-    angle = math.degrees(math.atan(m))
+    # angle = math.degrees(math.atan(m))
 
-    print(angle)
+    # print(angle)
 
-    return Enemy(x, y, player_ship.x, player_ship.y, angle)
+    return Enemy(x, y, player_ship.x, player_ship.y, 0, random.choice(enemy_surfaces))
 
 def generate_enemy(player_ship):
     walls = {
@@ -78,13 +91,16 @@ font = pygame.font.SysFont("monospace", 36)
 
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 GREEN = (0, 255,0)
-WHITE = (0,0,0)
+BLACK = (0,0,0)
+WHITE = (255, 255, 255)
 RED = (255, 0, 0)
+HP_WIDTH = 600
+HP_HEIGHT = 50
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Game.rs")
 
 MOVEMENT_CONSTANT = 10
-INVERSE_SPAWN_RATE = 30
+INVERSE_SPAWN_RATE = 40
 
 reloading = False
 reload_timer = 20
@@ -110,6 +126,10 @@ def init():
     global enemies
     enemies = []
 
+    global hp
+    hp = pygame.Rect(0, 0, HP_WIDTH, HP_HEIGHT)
+    hp.center = (400, 50)
+
 
 while pygame.event.poll().type != pygame.KEYDOWN:
     pass
@@ -117,8 +137,11 @@ while pygame.event.poll().type != pygame.KEYDOWN:
 init()
 
 while running:
+
     if gameover:
-        screen.fill((255, 255, 255))
+        screen.blit(gameover_screen, (0,0))
+        label = font.render("Final score: " + str(score), 1, WHITE)
+        screen.blit(label, (700, 50))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                     running = False
@@ -127,9 +150,10 @@ while running:
         pygame.display.update()
 
     else:
-        screen.fill(WHITE)
-        label = font.render("Score: " + str(score), 1, (255, 255, 255))
+        screen.fill(BLACK)
+        label = font.render("Score: " + str(score), 1, WHITE)
         screen.blit(label, (1200, 50))
+        pygame.draw.rect(screen, RED, hp)
 
         if randint(0, INVERSE_SPAWN_RATE) == 0:
             enemies.append(generate_enemy(SHIP))
@@ -152,7 +176,11 @@ while running:
             if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
                 enemies.remove(enemy)
             if enemy.collides_with(SHIP):
-                gameover = True
+                enemies.remove(enemy)
+                hp.width -= 60
+                if hp.width < 0:
+                    gameover = True
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -198,5 +226,6 @@ while running:
         clock.tick(60)
 
         score += 1
+
 
 pygame.quit()
