@@ -64,6 +64,7 @@ pygame.display.set_caption("Game.hs")
 
 SHIP = Ship(800, 850)
 MOVEMENT_CONSTANT = 50
+INVERSE_SPAWN_RATE = 20
 
 clock = pygame.time.Clock()
 
@@ -72,8 +73,9 @@ enemies = []
 
 while running:
     screen.fill(WHITE)
+    print(len(enemies))
 
-    if randint(0, 50) == 0:
+    if randint(0, INVERSE_SPAWN_RATE) == 0:
         enemies.append(generate_enemy(SHIP))
 
     for bullet in bullets:
@@ -88,22 +90,23 @@ while running:
                     break
 
 
-
     for enemy in enemies:
         enemy.move()
+        if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
+            enemies.remove(enemy)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.dict["key"] == pygame.K_LEFT:
-                SHIP.move(-MOVEMENT_CONSTANT, 0)
+                SHIP.move(-MOVEMENT_CONSTANT, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_RIGHT:
-                SHIP.move(MOVEMENT_CONSTANT,0)
+                SHIP.move(MOVEMENT_CONSTANT,0, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_UP:
-                SHIP.move(0, -MOVEMENT_CONSTANT)
+                SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_DOWN:
-                SHIP.move(0, MOVEMENT_CONSTANT)
+                SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_SPACE:
                 new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                 bullets.append(new_bullet)
