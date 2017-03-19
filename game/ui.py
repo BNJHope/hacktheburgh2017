@@ -125,14 +125,14 @@ while running:
                 SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_k:
                 SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
-            if event.dict["key"] == pygame.K_SPACE:
+            if event.dict["key"] == pygame.K_x:
                 if SHIP.gun.ammo <= 0:
                     print("No ammo")
                 else:
                     new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                     bullets.append(new_bullet)
                     SHIP.gun.shoot()
-            if event.dict["key"] == pygame.K_r:
+            if event.dict["key"] == pygame.K_z:
                 reloading = True
             if event.dict["key"] == pygame.K_a:
                 SHIP.gun.rotate(-5)
