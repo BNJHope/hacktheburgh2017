@@ -60,10 +60,11 @@ WHITE = (0,0,0)
 RED = (255, 0, 0)
 screen = pygame.display.set_mode(size)
 
-pygame.display.set_caption("Game.hs")
+pygame.display.set_caption("Game.hsii")
 
 SHIP = Ship(800, 850)
-MOVEMENT_CONSTANT = 50
+MOVEMENT_CONSTANT = 10
+INVERSE_SPAWN_RATE = 20
 
 clock = pygame.time.Clock()
 
@@ -72,30 +73,41 @@ enemies = []
 
 while running:
     screen.fill(WHITE)
+    print(len(enemies))
 
-    if randint(0, 15) == 0:
+    if randint(0, INVERSE_SPAWN_RATE) == 0:
         enemies.append(generate_enemy(SHIP))
 
     for bullet in bullets:
         bullet.move()
         if bullet.y < 0 or bullet.y > SCREEN_HEIGHT:
             bullets.remove(bullet)
+        else:        
+            for enemy in enemies:
+                if bullet.collides_with(enemy):
+                    bullets.remove(bullet)
+                    enemies.remove(enemy)
+                    break
+
 
     for enemy in enemies:
         enemy.move()
+        if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
+            enemies.remove(enemy)
 
     for event in pygame.event.get():
+        pygame.display.update()
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.dict["key"] == pygame.K_LEFT:
-                SHIP.move(-MOVEMENT_CONSTANT, 0)
-            if event.dict["key"] == pygame.K_RIGHT:
-                SHIP.move(MOVEMENT_CONSTANT,0)
-            if event.dict["key"] == pygame.K_UP:
-                SHIP.move(0, -MOVEMENT_CONSTANT)
-            if event.dict["key"] == pygame.K_DOWN:
-                SHIP.move(0, MOVEMENT_CONSTANT)
+            if event.dict["key"] == pygame.K_j:
+                SHIP.move(-MOVEMENT_CONSTANT, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+            if event.dict["key"] == pygame.K_l:
+                SHIP.move(MOVEMENT_CONSTANT,0, SCREEN_WIDTH, SCREEN_HEIGHT)
+            if event.dict["key"] == pygame.K_i:
+                SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
+            if event.dict["key"] == pygame.K_k:
+                SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
             if event.dict["key"] == pygame.K_SPACE:
                 new_bullet = Bullet(SHIP.gun.x, SHIP.gun.y, -SHIP.gun.rotation)
                 bullets.append(new_bullet)
