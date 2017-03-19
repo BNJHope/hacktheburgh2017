@@ -22,7 +22,8 @@ def draw_ship(screen, ship):
     # pygame.draw.rect(screen, RED, ship.gun.rect)
 
 def draw_enemy(screen, enemy):
-    screen.blit(enemy_ship_surface, enemy)
+    enemy_surface = pygame.transform.rotate(enemy_ship_surface, enemy.rotation)
+    screen.blit(enemy_surface, enemy)
     
 def draw_enemies(screen, enemies):
     for enemy in enemies:
@@ -49,7 +50,9 @@ def create_enemy(wall, player_ship):
     x = randint(wall["x_min"], wall["x_max"])
     y = randint(wall["y_min"], wall["y_max"])
 
-    return Enemy(x, y, player_ship.x, player_ship.y)
+    angle = 45 + math.atan(math.radians(y - player_ship.y) / math.radians(player_ship.x))
+
+    return Enemy(x, y, player_ship.x, player_ship.y, angle)
 
 def generate_enemy(player_ship):
     walls = {
@@ -89,8 +92,6 @@ while pygame.event.poll().type != pygame.KEYDOWN:
 while running:
     screen.fill(WHITE)
     
-
-
     print(len(enemies))
 
     if randint(0, INVERSE_SPAWN_RATE) == 0:
@@ -112,6 +113,8 @@ while running:
         enemy.move()
         if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
             enemies.remove(enemy)
+        if enemy.collides_with(SHIP):
+            print("dead") 
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

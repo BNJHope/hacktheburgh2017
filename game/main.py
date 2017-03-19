@@ -14,8 +14,9 @@ BULLET_WIDTH = 5
 BULLET_HEIGHT = 5
 BULLET_MOVEMENT = 10
 
-ENEMY_WIDTH = 25
-ENEMY_HEIGHT = 25
+ENEMY_WIDTH = 75
+ENEMY_HEIGHT = 75
+ENEMY_MOVEMENT = 100.0
 
 class Entity():
     
@@ -149,15 +150,15 @@ class Ship(Entity):
             self.gun.rotate_rect_points()
 
 class Enemy(Entity):
-    def __init__(self, x, y, target_x, target_y):
-        Entity.__init__(self, "enemy", x, y, ENEMY_WIDTH, ENEMY_HEIGHT, 0)
+    def __init__(self, x, y, target_x, target_y, rotation):
+        Entity.__init__(self, "enemy", x, y, ENEMY_WIDTH, ENEMY_HEIGHT, rotation)
         
         self.target_x = target_x
         self.target_y = target_y
 
         dx, dy = (self.target_x - self.x, self.target_y - self.y)
-        self.stepx = dx / 75.0
-        self.stepy = dy / 75.0
+        self.stepx = dx / ENEMY_MOVEMENT
+        self.stepy = dy / ENEMY_MOVEMENT
 
     def move(self):
         Entity.move(self, self.stepx, self.stepy)
