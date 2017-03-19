@@ -85,6 +85,10 @@ enemies = []
 
 while running:
     screen.fill(WHITE)
+    
+    while pygame.event.poll().type != pygame.KEYDOWN:
+        pass
+
     print(len(enemies))
 
     if randint(0, INVERSE_SPAWN_RATE) == 0:
