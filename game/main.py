@@ -152,7 +152,7 @@ class World():
 
 class Engine():
     
-    def main():
+    def main(self):
         logging.basicConfig()
         world = World(log=True)
         world.register(Ship(100, 100, log=True))
