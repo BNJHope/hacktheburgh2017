@@ -8,6 +8,7 @@ pygame.font.init()
 
 enemy1 = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
 enemy2 = pygame.transform.scale(pygame.image.load("../imgs/enemy2.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
+background = pygame.image.load("../imgs/background.png")
 gameover_screen = pygame.image.load("../imgs/gameover.png")
 
 enemy_surfaces = [enemy1, enemy2]
@@ -29,7 +30,7 @@ def draw_ship(screen, ship):
     # pygame.draw.rect(screen, RED, ship.gun.rect)
 
 def draw_enemy(screen, enemy):
-    enemy_surface = pygame.transform.rotate(enemy.surface, enemy.rotation)
+    enemy_surface = pygame.transform.rotate(enemy.surface, -enemy.rotation)
     screen.blit(enemy_surface, enemy)
     
 def draw_enemies(screen, enemies):
@@ -57,22 +58,14 @@ def create_enemy(wall, player_ship):
 
     m = (player_ship.y - y) / (player_ship.x - x)
     # print(str(x) + " : " + str(y))
-    # print("m: " + str(m))
 
-    if x > player_ship.x and y < player_ship.y:
-        angle = 180 + math.degrees(math.atan2(x - player_ship.x,player_ship.y - y))
-    elif x > player_ship.x and y > player_ship.y:
-        angle = 180 + math.degrees(math.atan2(y - player_ship.y, x - player_ship.x))
-    elif x < player_ship.x and y > player_ship.y:
-        angle = math.degrees(math.atan2(player_ship.x - x, y - player_ship.y))
-    else :
-        angle = math.degrees(math.atan2(player_ship.y - y, player_ship.y - y))
+    theta = math.atan(m)
+    angle = 90 + math.degrees(theta)
 
-    # angle = math.degrees(math.atan(m))
+    if (x > player_ship.x):
+        angle += 180
 
-    # print(angle)
-
-    return Enemy(x, y, player_ship.x, player_ship.y, 0, random.choice(enemy_surfaces))
+    return Enemy(x, y, player_ship.x, player_ship.y, angle, random.choice(enemy_surfaces))
 
 def generate_enemy(player_ship):
     walls = {
@@ -97,7 +90,7 @@ RED = (255, 0, 0)
 HP_WIDTH = 600
 HP_HEIGHT = 50
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption("Game.rs")
+pygame.display.set_caption("Game.idr")
 
 MOVEMENT_CONSTANT = 10
 INVERSE_SPAWN_RATE = 40
@@ -150,7 +143,8 @@ while running:
         pygame.display.update()
 
     else:
-        screen.fill(BLACK)
+        screen.blit(background, (0,0))
+
         label = font.render("Score: " + str(score), 1, WHITE)
         screen.blit(label, (1200, 50))
         pygame.draw.rect(screen, RED, hp)
