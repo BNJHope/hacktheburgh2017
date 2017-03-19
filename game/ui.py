@@ -148,6 +148,16 @@ def init():
     global enemy_surfaces 
     global score
     global next_limit
+    global MOVEMENT_CONSTANT
+    global INVERSE_SPAWN_RATE
+    global NEXT_LIMIT_INC
+    global next_func
+
+    MOVEMENT_CONSTANT = 25
+    INVERSE_SPAWN_RATE = 40
+    NEXT_LIMIT_INC = 500
+
+    next_func = lambda *args: args
 
     score = 0
     next_limit = NEXT_LIMIT_INC
@@ -188,6 +198,7 @@ pygame.display.update()
 
 while pygame.event.poll().type != pygame.KEYDOWN:
     pass
+
 
 
 while running:
@@ -245,18 +256,20 @@ while running:
                     gameover = True
 
 
+       
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.dict["key"] == pygame.K_j:
-                    SHIP.move(-MOVEMENT_CONSTANT, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+                    next_func = lambda: SHIP.move(-MOVEMENT_CONSTANT, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if event.dict["key"] == pygame.K_l:
-                    SHIP.move(MOVEMENT_CONSTANT,0, SCREEN_WIDTH, SCREEN_HEIGHT)
+                    next_func = lambda: SHIP.move(MOVEMENT_CONSTANT,0, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if event.dict["key"] == pygame.K_i:
-                    SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
+                    next_func = lambda: SHIP.move(0, -MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if event.dict["key"] == pygame.K_k:
-                    SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
+                    next_func = lambda: SHIP.move(0, MOVEMENT_CONSTANT, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if event.dict["key"] == pygame.K_x:
                     if SHIP.gun.ammo <= 0:
                         noammo.play()
@@ -272,12 +285,15 @@ while running:
                     reloading = True
                     reload_sound.play()
                 if event.dict["key"] == pygame.K_a:
-                    SHIP.gun.rotate(-5)
+                    next_func = lambda: SHIP.gun.rotate(-5)
                     cannon = rot_center(cannon, SHIP.rect.center, 5)
 
                 if event.dict["key"] == pygame.K_d:
-                    SHIP.gun.rotate(5)
+                    next_func = lambda: SHIP.gun.rotate(5)
                     cannon = rot_center(cannon, SHIP.rect.center, -5)
+
+        next_func()
+       
 
         if reloading:
             reload_timer -= 1
@@ -290,7 +306,6 @@ while running:
         draw_ship(screen, SHIP)
         draw_entities(screen, RED, bullets)
         draw_enemies(screen, enemies)
-        #draw_entities(screen, RED, enemies)
 
         pygame.display.update()
 
