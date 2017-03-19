@@ -87,7 +87,6 @@ class Entity():
         c = math.cos(rotation_angle)
 
         point = list(point)
-        print(point)
 
         point[self.COORDINATE_X] -= self.x
         point[self.COORDINATE_Y] -= self.y
@@ -98,7 +97,6 @@ class Entity():
         point[self.COORDINATE_X] = x_new + self.x
         point[self.COORDINATE_Y] = y_new + self.y
 
-        print(point)
         return tuple(point)
 
     def rotate_rect_points(self):
@@ -115,7 +113,6 @@ class Entity():
 class Bullet(Entity):
     def __init__(self, x, y, dir):
         Entity.__init__(self, "bullet", x, y, BULLET_WIDTH, BULLET_HEIGHT, dir)
-        print(self.pointlist)
 
     def move(self):
         rotation_radians = math.radians(self.rotation)
@@ -134,10 +131,14 @@ class Ship(Entity):
         Entity.__init__(self, "ship", x, y, SHIP_WIDTH, SHIP_HEIGHT, 0, log)
         self.gun = Gun(self)
 
-    def move(self, x_delta, y_delta):
-        Entity.move(self, x_delta, y_delta)
-        self.gun.move(x_delta, y_delta)
-        self.gun.rotate_rect_points()
+    def move(self, x_delta, y_delta, x_max, y_max):
+        x = self.x + x_delta
+        y = self.y + y_delta
+
+        if not (x > x_max or x < 0 or y > y_max or y < 0):
+            Entity.move(self, x_delta, y_delta)
+            self.gun.move(x_delta, y_delta)
+            self.gun.rotate_rect_points()
 
 class Enemy(Entity):
     def __init__(self, x, y, target_x, target_y):
@@ -146,12 +147,12 @@ class Enemy(Entity):
         self.target_x = target_x
         self.target_y = target_y
 
-    def move(self):
         dx, dy = (self.target_x - self.x, self.target_y - self.y)
-        stepx, stepy = (dx / 20.0, dy / 20.0)
+        self.stepx = dx / 75.0
+        self.stepy = dy / 75.0
 
-        Entity.move(self, stepx, stepy)
-
+    def move(self):
+        Entity.move(self, self.stepx, self.stepy)
 
 
 class World():

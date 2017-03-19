@@ -64,6 +64,7 @@ pygame.display.set_caption("Game.hsii")
 
 SHIP = Ship(800, 850)
 MOVEMENT_CONSTANT = 50
+INVERSE_SPAWN_RATE = 20
 
 clock = pygame.time.Clock()
 
@@ -72,8 +73,9 @@ enemies = []
 
 while running:
     screen.fill(WHITE)
+    print(len(enemies))
 
-    if randint(0, 50) == 0:
+    if randint(0, INVERSE_SPAWN_RATE) == 0:
         enemies.append(generate_enemy(SHIP))
 
     for bullet in bullets:
@@ -88,9 +90,10 @@ while running:
                     break
 
 
-
     for enemy in enemies:
         enemy.move()
+        if enemy.y < 0 or enemy.y > SCREEN_HEIGHT:
+            enemies.remove(enemy)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
