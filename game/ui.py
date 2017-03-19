@@ -10,6 +10,7 @@ pew = pygame.mixer.Sound("../sfx/pew.wav")
 reload_sound = pygame.mixer.Sound("../sfx/reload.wav")
 explosion = pygame.mixer.Sound("../sfx/exp2.wav")
 noammo = pygame.mixer.Sound("../sfx/noammo.wav")
+background_music = pygame.mixer.Sound("../sfx/background.wav")
 pygame.font.init()
 
 def move_poly(polygon, x, y):
@@ -138,6 +139,7 @@ reload_timer = 20
 clock = pygame.time.Clock()
 
 def init():
+    background_music.play(-1  )
     global ship_img
     global cannon
     global enemy1
@@ -186,8 +188,8 @@ def init():
     enemy1 = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
     enemy2 = pygame.transform.scale(pygame.image.load("../imgs/enemy2.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
     background = pygame.image.load("../imgs/background.png")
-    gameover_screen = pygame.transform.scale(pygame.image.load("../imgs/gameover.png"), (1600, 900))
-    start_screen = pygame.transform.scale(pygame.image.load("../imgs/start.png"), (1600, 900))
+    gameover_screen = pygame.transform.scale(pygame.image.load("../imgs/gameover.png"), (SCREEN_WIDTH, SCREEN_HEIGHT))
+    start_screen = pygame.transform.scale(pygame.image.load("../imgs/start.png"), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
     enemy_surfaces = [enemy1, enemy2]
 
@@ -210,6 +212,7 @@ while running:
             INVERSE_SPAWN_RATE -= 3
 
     if gameover:
+        background_music.stop()
         screen.blit(gameover_screen, (0,0))
         label = font.render("Final score: " + str(score), 1, WHITE)
         screen.blit(label, (700, 50))
