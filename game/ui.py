@@ -4,7 +4,7 @@ from main import *
 from random import randint
 import random
 
-enemy_ship_surface = pygame.image.load("../imgs/enemy.png")
+enemy_ship_surface = pygame.transform.scale(pygame.image.load("../imgs/enemy.png"), (ENEMY_WIDTH, ENEMY_HEIGHT))
 
 def move_poly(polygon, x, y):
     for points in polygon:
@@ -73,7 +73,7 @@ pygame.display.set_caption("Game.hsii")
 
 SHIP = Ship(800, 850)
 MOVEMENT_CONSTANT = 10
-INVERSE_SPAWN_RATE = 20
+INVERSE_SPAWN_RATE = 30
 
 clock = pygame.time.Clock()
 
@@ -83,11 +83,13 @@ reload_timer = 20
 bullets = []
 enemies = []
 
+while pygame.event.poll().type != pygame.KEYDOWN:
+    pass
+
 while running:
     screen.fill(WHITE)
     
-    while pygame.event.poll().type != pygame.KEYDOWN:
-        pass
+
 
     print(len(enemies))
 
