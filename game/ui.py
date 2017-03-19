@@ -4,6 +4,8 @@ from main import *
 from random import randint
 import random
 
+enemy_ship_surface = pygame.image.load("../imgs/enemy.png")
+
 def move_poly(polygon, x, y):
     for points in polygon:
         points[0] += x
@@ -19,6 +21,13 @@ def draw_ship(screen, ship):
     draw_entity(screen, RED, ship.gun)
     # pygame.draw.rect(screen, RED, ship.gun.rect)
 
+def draw_enemy(screen, enemy):
+    screen.blit(enemy_ship_surface, enemy)
+    
+def draw_enemies(screen, enemies):
+    for enemy in enemies:
+        draw_enemy(screen, enemy)
+    
 def draw_entities(screen, colour, entities):
     for entity in entities:
         draw_entity(screen, colour, entity)
@@ -135,7 +144,8 @@ while running:
 
     draw_ship(screen, SHIP)
     draw_entities(screen, RED, bullets)
-    draw_entities(screen, RED, enemies)
+    draw_enemies(screen, enemies)
+    #draw_entities(screen, RED, enemies)
 
     pygame.display.update()
 
